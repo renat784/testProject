@@ -1,0 +1,119 @@
+<div *ngIf="auth.user | async as user; else showLogin">
+  <!-- top bar -->
+  <div class="py-2 bg-grey grid grid-cols-3">
+    <div></div>
+    <div class="d-flex flex-row justify-content-center align-self-center">
+      <img [src]="logo" width="40" />
+      <p class="text-3xl ms-3">Anecdotes Live Chat</p>
+    </div>
+    <div class="d-flex flex-row justify-content-end pr-12 align-items-center">
+      <strong class="me-5">Welcome back, {{ user.displayName }}!</strong>
+      <button class="btn btn-link" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- chat -->
+  <div class="grid grid-cols-4 gap-3 m-5">
+    <!-- left part -->
+    <div class="maxHeight rounded-3 border-1 border-secondary bg-grey">
+      <!-- rooms -->
+      <div class="h-5/6 d-flex flex-column overflow-auto overflow-y-scroll">
+        <button
+          class="btn mt-3 mx-5"
+          *ngFor="let room of rooms | sortByDate"
+          [ngClass]="activeChat == room.name ? 'btn--active' : 'btn--secondary'"
+          (click)="chatClicked(room.name)"
+        >
+          {{ room.name }}
+        </button>
+      </div>
+      <!-- create room -->
+      <hr class="mt-3" />
+      <div class="d-flex flex-column text-center pt-4 mx-5">
+        <button class="btn btn--primary" (click)="createChatRoom()">
+          Create Room
+        </button>
+        <small class="mt-2">Powered By FireStore</small>
+      </div>
+    </div>
+    <!-- right part -->
+    <div class="col-span-3 maxHeight">
+      <!-- messages -->
+      <div
+        class="h-5/6 bg-grey rounded-3 border-1 border-secondary overflow-auto overflow-y-scroll d-flex flex-column"
+      >
+        <ng-container>
+          <p class="py-2 ps-5 bg-slate-200">
+            <strong>{{
+              activeChat
+                ? activeChat
+                : rooms.length
+                ? "Select any Room to start chatting"
+                : "Create Room and Select it to start chatting"
+            }}</strong>
+          </p>
+          <div
+            *ngFor="
+              let message of messages
+                | filterByChatRoom: activeChat
+                | sortByDate
+            "
+            class="w-2/4 my-4 mx-5 p-2 rounded-3 border-1 border-secondary"
+            [ngClass]="
+              user.uid == message.user.uid
+                ? 'bg-white align-self-end'
+                : ' bg-gray'
+            "
+          >
+            <img
+              class="inline-block h-8 w-8 rounded-full ring-2 ring-slate-200"
+              [src]="defaultProfileImage"
+            />
+            <strong class="ms-3">{{ message.user.displayName }}</strong>
+            <hr class="my-2" />
+            <p class="my-3">{{ message.text }}</p>
+          </div>
+        </ng-container>
+      </div>
+      <!-- send message  -->
+      <div
+        class="py-9 mt-3 bg-grey rounded-3 border-1 border-secondary d-flex align-items-center"
+      >
+        <div class="d-flex flex-row w-100 px-3">
+          <input
+            type="text"
+            placeholder="Write a message..."
+            [disabled]="!activeChat"
+            class="form-control"
+            [(ngModel)]="msg"
+            (keyup.enter)="sendMessage()"
+          />
+          <button
+            [disabled]="!activeChat"
+            class="btn btn--primary w-25 ms-3"
+            (click)="sendMessage()"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- login -->
+<ng-template #showLogin>
+  <div
+    class="m-5 bg-grey maxHeight d-flex flex-column justify-content-center align-items-center"
+  >
+    <div class="d-flex flex-row align-items-center">
+      <img [src]="logo" width="100" />
+      <p class="text-5xl ms-3">Anecdotes Live Chat</p>
+    </div>
+    <p class="text-3xl mt-4 mb-5">Please login to use chat</p>
+    <div>
+      <button class="btn btn--primary" (click)="login()">
+        Login with Google
+      </button>
+    </div>
+  </div>
+</ng-template>

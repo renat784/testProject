@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "livechat-aa95c": {
+      "hosting": {
+        "testProject": [
+          "livechat-aa95c"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "livechat-aa95c"
+  }
+}
