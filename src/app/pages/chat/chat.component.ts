@@ -1,9 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Store } from '@ngrx/store';
 import firebase from 'firebase/compat/app';
+import { Observable } from 'rxjs';
 import { CHAT, Message, Room, User, UserSettings } from 'src/app/core/models';
 import { ChatService } from 'src/app/core/services';
+import {
+  AddMessage,
+  AddRoom,
+  InitChat,
+  SaveUserSettings,
+} from 'src/app/core/store/actions/chat.actions';
+import {
+  getMessages,
+  getRooms,
+  getUsersSettings,
+} from 'src/app/core/store/selectors/chat.selectors';
 
 @Component({
   selector: 'app-chat',
@@ -13,9 +26,9 @@ import { ChatService } from 'src/app/core/services';
 export class ChatComponent implements OnInit {
   readonly logo = '../../../assets/images/icon-512x512.png';
   readonly defaultProfileImage = '../../../assets/images/default.png';
-
   messages: Array<Message> = [];
   rooms: Array<Room> = [];
+  usersSettings: Array<any> = [];
   user: User | undefined;
   activeChat = '';
   msg = '';
@@ -23,13 +36,54 @@ export class ChatComponent implements OnInit {
   constructor(
     public db: AngularFirestore,
     public chatService: ChatService,
-    public auth: AngularFireAuth
-  ) {}
-
-  ngOnInit(): void {
-    this.loadSettings();
-    this.trackChanges();
+    public auth: AngularFireAuth,
+    private store: Store<{ chat: any }>
+  ) {
+    this.store.dispatch(InitChat());
+    this.selectData();
   }
+
+  selectData() {
+    this.store.select(getRooms).subscribe((rooms) => {
+      this.rooms = rooms.length
+        ? rooms.map((room: any) => {
+            return { ...room, date: room.date.toDate() };
+          })
+        : this.rooms;
+
+      console.log(
+        '%c this.rooms ',
+        'background-color:green; color:white',
+        this.rooms
+      );
+    });
+
+    this.store.select(getMessages).subscribe((messages) => {
+      this.messages = messages.length
+        ? messages.map((msg: any) => {
+            return { ...msg, date: msg.date.toDate() };
+          })
+        : this.messages;
+
+      console.log(
+        '%c this.messages ',
+        'background-color:green; color:white',
+        this.messages
+      );
+    });
+
+    this.store.select(getUsersSettings).subscribe((usersSettings) => {
+      this.usersSettings = usersSettings.length ? usersSettings : [];
+      console.log(
+        '%c this.usersSettings ',
+        'background-color:green; color:white',
+        this.usersSettings
+      );
+      this.loadSettings();
+    });
+  }
+
+  ngOnInit(): void {}
 
   loadSettings(): void {
     this.auth.user.subscribe((i) => {
@@ -39,26 +93,9 @@ export class ChatComponent implements OnInit {
         displayName: i?.displayName,
       };
 
-      this.chatService.loadUserSettings(this.user).subscribe((doc) => {
-        this.activeChat = doc.exists ? doc.data().lastVisitedChat : '';
-      });
+      let userSettings = this.usersSettings.find((i) => i.id == this.user?.uid);
+      this.activeChat = userSettings ? userSettings.lastVisitedChat : '';
     });
-  }
-
-  trackChanges(): void {
-    this.db
-      .collection(CHAT.ROOMS)
-      .valueChanges({ idField: 'id' })
-      .subscribe((i: any) => {
-        this.rooms = i;
-      });
-
-    this.db
-      .collection(CHAT.MESSAGES)
-      .valueChanges({ idField: 'id' })
-      .subscribe((i: any) => {
-        this.messages = i;
-      });
   }
 
   sendMessage(): void {
@@ -70,7 +107,7 @@ export class ChatComponent implements OnInit {
         roomName: this.activeChat,
       };
 
-      this.chatService.addMessage(message);
+      this.store.dispatch(AddMessage({ message }));
       this.msg = '';
     }
   }
@@ -82,7 +119,8 @@ export class ChatComponent implements OnInit {
       user: this.user,
       lastVisitedChat: this.activeChat,
     };
-    this.chatService.saveUserSettings(userSettings);
+
+    this.store.dispatch(SaveUserSettings({ userSettings }));
   }
 
   createChatRoom(): void {
@@ -91,7 +129,8 @@ export class ChatComponent implements OnInit {
       name: `Room ${this.rooms.length + 1}`,
       date: new Date(),
     };
-    this.chatService.createChatRoom(room);
+
+    this.store.dispatch(AddRoom({ room }));
   }
 
   login(): void {
