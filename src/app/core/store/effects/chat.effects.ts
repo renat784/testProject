@@ -13,10 +13,7 @@ export class ChatEffects {
       return this.actions$.pipe(
         ofType(AddMessage),
         pluck('message'),
-        switchMap((i) => this.chatService.addMessage(i)),
-        tap((i) =>
-          console.log('%c i ', 'background-color:green; color:white', i)
-        )
+        switchMap((i) => this.chatService.addMessage(i))
       );
     },
     { dispatch: false }
@@ -27,10 +24,7 @@ export class ChatEffects {
       return this.actions$.pipe(
         ofType(AddRoom),
         pluck('room'),
-        switchMap((i) => this.chatService.createChatRoom(i)),
-        tap((i) =>
-          console.log('%c i ', 'background-color:green; color:white', i)
-        )
+        switchMap((i) => this.chatService.createChatRoom(i))
       );
     },
     { dispatch: false }
@@ -41,10 +35,7 @@ export class ChatEffects {
       return this.actions$.pipe(
         ofType(SaveUserSettings),
         pluck('userSettings'),
-        switchMap((i) => this.chatService.saveUserSettings(i)),
-        tap((i) =>
-          console.log('%c i ', 'background-color:green; color:white', i)
-        )
+        switchMap((i) => this.chatService.saveUserSettings(i))
       );
     },
     { dispatch: false }

@@ -5,18 +5,19 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { SETTINGS as AUTH_SETTINGS } from '@angular/fire/compat/auth';
 import { AppRoutingModule } from './app-routing.module';
-import { HomeComponent } from './pages/home/home.component';
 import { chatReducer } from './core/store/reducers/chat.reducers';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EffectsModule } from '@ngrx/effects';
 import { ChatEffects, InitEffects } from './core/store/effects';
+import { TopBarModule } from './pages/top-bar/top-bar.module';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    TopBarModule,
     AngularFireModule.initializeApp(environment.firebase),
     EffectsModule.forRoot([InitEffects, ChatEffects]),
     StoreModule.forRoot({ chat: chatReducer }),

@@ -1,0 +1,21 @@
+<div
+  class="py-9 mt-3 bg-grey rounded-3 border-1 border-secondary d-flex align-items-center"
+>
+  <div class="d-flex flex-row w-100 px-3">
+    <input
+      type="text"
+      placeholder="Write a message..."
+      [disabled]="!activeChat"
+      class="form-control"
+      [(ngModel)]="msg"
+      (keyup.enter)="sendMessage()"
+    />
+    <button
+      [disabled]="!activeChat"
+      class="btn btn--primary w-25 ms-3"
+      (click)="sendMessage()"
+    >
+      Send
+    </button>
+  </div>
+</div>
