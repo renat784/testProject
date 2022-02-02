@@ -24,10 +24,7 @@ export class InitEffects {
     return this.actions$.pipe(
       ofType(InitChat),
       take(1),
-      tap((i) => this.getData()),
-      tap((i) =>
-        console.log('%c init ', 'background-color:green; color:white', i)
-      )
+      tap(() => this.getData())
     );
   });
 

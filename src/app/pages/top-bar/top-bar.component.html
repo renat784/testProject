@@ -1,0 +1,16 @@
+<div class="py-2 bg-grey grid grid-cols-3">
+  <div></div>
+  <div class="d-flex flex-row justify-content-center align-self-center">
+    <img [src]="logo" width="40" />
+    <p class="text-3xl ms-3">Anecdotes Live Chat</p>
+  </div>
+  <div class="d-flex flex-row justify-content-end pr-12 align-items-center">
+    <ng-container *ngIf="auth.user | async as user; else notLogged">
+      <strong class="me-5">Welcome back, {{ user.displayName }}!</strong>
+      <button class="btn btn-link" (click)="logout()">Logout</button>
+    </ng-container>
+    <ng-template #notLogged>
+      <strong>You not logged in</strong>
+    </ng-template>
+  </div>
+</div>

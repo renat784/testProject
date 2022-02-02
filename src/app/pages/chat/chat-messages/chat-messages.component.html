@@ -1,0 +1,31 @@
+<div
+  class="h-5/6 bg-grey rounded-3 border-1 border-secondary overflow-auto overflow-y-scroll d-flex flex-column"
+>
+  <ng-container>
+    <p class="py-2 ps-5 bg-slate-200">
+      <strong>{{
+        activeChat ? activeChat : "Select any Room to start chatting"
+      }}</strong>
+    </p>
+    <div
+      *ngFor="
+        let message of messages$
+          | async
+          | filterByChatRoom: activeChat
+          | sortByDate
+      "
+      class="w-2/4 my-4 mx-5 p-2 rounded-3 border-1 border-secondary"
+      [ngClass]="
+        user.uid == message.user.uid ? 'bg-white align-self-end' : ' bg-gray'
+      "
+    >
+      <img
+        class="inline-block h-8 w-8 rounded-full ring-2 ring-slate-200"
+        [src]="defaultProfileImage"
+      />
+      <strong class="ms-3">{{ message.user.displayName }}</strong>
+      <hr class="my-2" />
+      <p class="my-3">{{ message.text }}</p>
+    </div>
+  </ng-container>
+</div>

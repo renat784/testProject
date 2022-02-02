@@ -24,11 +24,6 @@ export const AddRoom = createAction(
   props<{ room: Room }>()
 );
 
-export const AddUserSettings = createAction(
-  MessageActionType.ADD_USER_SETTINGS,
-  props<{ userSettings: UserSettings }>()
-);
-
 export const GetMessages = createAction(
   MessageActionType.GET_MESSAGES,
   props<{ messages: Array<Message> }>()
